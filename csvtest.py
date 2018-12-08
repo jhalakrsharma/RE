@@ -1,6 +1,3 @@
-# This is for testing purpose only. 
-
-
 import glob, os
 import subprocess
 import csv

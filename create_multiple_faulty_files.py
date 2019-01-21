@@ -8,12 +8,12 @@ import sys
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Creating an empty string to read the parameters.
 parameters = ""
-        
+
 #-------------------------------------------------------------------------------------------------------------------------------
-### Opening the file, reading line by line, searchin for input, output or wire keyboard and saving the lines in parameters string. 
-with open('C:\\Users\\ADMIN\\Anaconda3\\struc_fa_golden_py.v', 'r') as f:
+### Opening the file, reading line by line, searchin for input, output or wire keyboard and saving the lines in parameters string.
+with open('E:\\MS by Research\\Thesis\\python files\\struc_fa_golden_py.v', 'r') as f:
     for line in f:
-        if "input" in line or "output" in line or "wire" in line:
+        if "output" in line or "wire" in line:
             #print(line.partition('//')[0])
             parameters += line.partition('//')[0]
 
@@ -46,6 +46,10 @@ parameters = list(OrderedDict.fromkeys(parameters))
 # Removing clock from the list if present
 if "clk" in parameters:
     parameters.remove("clk")
+if "d" in parameters:
+    parameters.remove("d")
+if "q" in parameters:
+    parameters.remove("q")
 if "reg" in parameters:
     parameters.remove("reg")
     number = len(parameters)
@@ -61,29 +65,31 @@ linenumber  = []
 linenumber2 = []
 enable      = ", en);"
 input2      = parameters
-print(type(parameters))
+lines_output = []
+#print(type(parameters))
 
 for parameter in parameters:
-    with open('C:\\Users\\ADMIN\\Anaconda3\\fault{}.v'.format(parameter), "w") as f:        
-        with open('C:\\Users\\ADMIN\\Anaconda3\\struc_fa_golden_py.v', 'r') as h:
+    with open('E:\\MS by Research\\Thesis\\python files\\fault{}.v'.format(parameter), "w") as f:
+        with open('E:\\MS by Research\\Thesis\\python files\\struc_fa_golden_py.v', 'r') as h:
             for num, line in enumerate(h, 1):
                 if lookup in line:
                     linenumber.append(num)
 
             change = "\txor u1 (error, en, " + parameter + ");\n"
 
-        with open('C:\\Users\\ADMIN\\Anaconda3\\struc_fa_golden_py.v', 'r') as k:
+        with open('E:\\MS by Research\\Thesis\\python files\\struc_fa_golden_py.v', 'r') as k:
             lines = k.readlines()
 
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'w') as m:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'w') as m:
             for i, line in enumerate(lines):
                 if i == linenumber[0] - 1:
                     m.write(change)
                 m.write(line)
 
+
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Adding enable port in the DUT in testbench
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as j:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as j:
             for num, line in enumerate(j, 1):
                 if lookup1 in line:
                     linenumber2.append(num)
@@ -92,65 +98,58 @@ for parameter in parameters:
 
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Opening fault1 file in read mode, saving the contents in variable named "lines"
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as k:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as k:
             lines = k.readlines()
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'w') as m:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'w') as m:
             for i, line in enumerate(lines):
                 if i == linenumber2[0] + 1:
                     m.write(dut_line)
-                m.write(line)  
-                
+                m.write(line)
+
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Finding the line number to add new parameters in the faulty file
         new_parameter = []
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as k:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as k:
             for num, line in enumerate(k, 0):
                 if "input" in line or "reg" in line or "wire" in line:
-                      new_parameter.append(num)  
+                      new_parameter.append(num)
 
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Adding new input 'enable' in the faulty file
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as p:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as p:
             lines_again = p.readlines()
-            
+
         lines_again[new_parameter[0]] = lines_again[new_parameter[0]].replace("\n", "")
         lines_again[new_parameter[0]] = lines_again[new_parameter[0]] + " en, \n"
 
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'w') as n:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'w') as n:
             for item in lines_again:
                 n.write("%s" % item)
                 #f.write("%s" % item)
-                
-#------------------------------------------------------------------------------------------------------------------------------- 
-### Adding new wire error in the faulty file
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as z:
+
+#-------------------------------------------------------------------------------------------------------------------------------
+### Adding new wire erroror in the faulty file
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as z:
             lines_again = z.readlines()
 
         lines_again[new_parameter[1]] = lines_again[new_parameter[1]].replace("\n", "")
         lines_again[new_parameter[1]] = lines_again[new_parameter[1]].replace(";", "")
         lines_again[new_parameter[1]] = lines_again[new_parameter[1]] + ", error; \n"
 
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'w') as b:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'w') as b:
             for item in lines_again:
                 b.write("%s" % item)
                 #f.write("%s" % item)
 #-------------------------------------------------------------------------------------------------------------------------------
 ### Adding new reg 'en' in the testbench in the faulty file
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'r') as k:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'r') as k:
             lines_again = k.readlines()
 
         lines_again[new_parameter[2]] = lines_again[new_parameter[2]].replace("\n", "")
         lines_again[new_parameter[2]] = lines_again[new_parameter[2]].replace(";", "")
         lines_again[new_parameter[2]] = lines_again[new_parameter[2]] + ", en; \n"
 
-        with open('C:\\Users\\ADMIN\\Anaconda3\\fault1.v', 'w') as b:
+        with open('E:\\MS by Research\\Thesis\\python files\\fault1.v', 'w') as b:
             for item in lines_again:
                 #b.write("%s" % item)
                 f.write("%s" % item)
-                
-            
-# # Generating a random number, to randomly select one of the clock cycle to inject fault
-# # After generating random number, print the index
-# for x in range(1):
-#     randcycle = random.randint(0, 100)
-#     print ("Random clock cycle = ",randcycle)
